@@ -1,61 +1,45 @@
 import java.util.NoSuchElementException;
+import java.util.Random;
 public class SortStack
-{
-    private Stack<Integer> stack1;
-    private Stack<Integer> stack2;
-    
-    public SortStack()
+{   
+    public static void sort(Stack<Integer> stack1)
     {
-        stack1 = new Stack<Integer>();
-        stack2 = new Stack<Integer>();
-    }
-    
-    public void push(int item)
-    {
-        if (!stack1.isEmpty()) {
-            if (stack1.peek() > item) {
-                int tmp = stack1.pop();
-                stack1.push(item);
-                stack1.push(tmp);
-            } else {
-                stack1.push(item);
-            }
-        } else {
-            stack1.push(item);
-        }
-    }
-    
-    public int pop()
-    {
-        if (stack1.isEmpty()) throw new NoSuchElementException();
-        int item = stack1.pop();
+        Stack<Integer> stack2 = new Stack<Integer>();
         while (!stack1.isEmpty()) {
-            stack2.push(stack1.pop());
+            int target = stack1.pop();
+            //int n = 0;
+            while (!stack2.isEmpty() && stack2.peek() < target) {
+                stack1.push(stack2.pop());
+               // n++;
+            }
+            stack2.push(target);
+            /*
+            for (int i = 0; i < n; i++) {
+                stack2.push(stack1.pop());
+            }*/
         }
+        
         while (!stack2.isEmpty()) {
-            push(stack2.pop());
+            stack1.push(stack2.pop());
         }
-        return item;
     }
+
     
     public static void main(String[] args)
     {
-        SortStack stack = new SortStack();
-        for (int i = 10; i > 0; i--) { //10-1
-            stack.push(i);
+        Stack<Integer> stack = new Stack<Integer>();
+        Random random = new Random();
+        for (int i = 0; i < 10; i++)
+        {
+            stack.push(random.nextInt(10));
         }
+
         
-        for (int i = 0; i < 5; i++) { //10-6
+        sort(stack);
+        for (int i = 0; i < 10; i++) { //10-6
             System.out.println(stack.pop());
         }
-        
-        for (int i = -5; i < 0; i++) {
-            stack.push(i);
-        }
-        stack.push(100);
-        for (int i = 0; i < 5; i++) { //10-6
-            System.out.println(stack.pop());
-        }
+
     }
     
 }
