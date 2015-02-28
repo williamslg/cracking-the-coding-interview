@@ -122,38 +122,40 @@ public class AddList
     public static void main(String[] args)
     {
         Node first = new Node();
-        first.item = 6;
+        first.item = 9;
         Node oldfirst = first;
         first = new Node();
-        first.item = 1;
+        first.item = 9;
         first.next = oldfirst;
-        
+        /*
         oldfirst = first;
         first = new Node();
-        first.item = 7;
+        first.item = 9;
         first.next = oldfirst;
-        
+        */
         Node first2 = new Node();
-        first2.item = 3;
+        first2.item = 1;
         Node oldfirst2 = first2;
 
       
+        /*
         first2 = new Node();
-        first2.item = 9;
+        first2.item = 1;
         first2.next = oldfirst2;
+        
         
         oldfirst2 = first2;
         first2 = new Node();
         first2.item = 5;
         first2.next = oldfirst2;
- 
+ */
         
         AddList.print(first);
         AddList.print(first2);
         
-        //Node head = AddList.addNumber(first, first2);
+        Node head = AddList.addNumber(first, first2);
         //AddList.print(head);
-        Node head = AddList.recursiveAdd(first, first2, 0);
+        //Node head = AddList.recursiveAdd(first, first2, 0);
         AddList.print(head);
     }
 }
