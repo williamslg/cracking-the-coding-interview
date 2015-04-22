@@ -1,91 +1,96 @@
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.LinkedList;
 public class Q7
 {
-    private static class Person implements Comparable<Person>
+    public static enum Color
     {
-        public int height;
-        public int weight;
-        
-        public Person(int h, int w)
+        Black, White, Red, Yellow, Green
+    }
+    
+    public static class Point
+    {
+        int x;
+        int y;
+        public Point(int a, int b)
         {
-            height = h;
-            weight = w;
-        }
-        
-        public int compareTo(Person that)
-        {
-            if (this.height != that.height) {
-                return ((Integer)this.height).compareTo(that.height);
-            } else {
-                return ((Integer)this.weight).compareTo(that.weight);
-            }
-        }
-        
-        public boolean isLess(Person that) {
-            if (this.height < that.height && this.weight < that.weight) {
-                return true;
-            } else {
-                return false;
-            }
+            x = a;
+            y = b;
         }
     }
     
-    public static ArrayList<Person> maxSeq(Person[] A)
+    public static boolean paintFill(Color[][] screen, int x, int y, Color ocolor, Color ncolor)
     {
-        if (A == null) return null;
-        ArrayList<Person>[] solution = (ArrayList<Person>[])new ArrayList[A.length]; //unchecked cast warning
-        //ArrayList<Person>[] solution = new ArrayList[A.length]; //this is from CTCI
-        
-        Arrays.sort(A);
-        
-        sequence(A, solution, 0);
-        
-        ArrayList<Person> result = solution[0];
-        
-        for (int i = 1; i < solution.length; i++) {
-            if (solution[i].size() > result.size()) {
-                result = solution[i];
-            }
+        if (x < 0 || x >= screen[0].length || y < 0 || y >= screen.length) return false;
+        if (screen[y][x] == ocolor) {
+            screen[y][x] = ncolor;
+            paintFill(screen, x-1, y, ocolor, ncolor); // left
+            paintFill(screen, x+1, y, ocolor, ncolor); // right
+            paintFill(screen, x, y-1, ocolor, ncolor); // top
+            paintFill(screen, x, y+1, ocolor, ncolor); // bottom
         }
-        
-        return result;
+        return true;
     }
     
-    private static void sequence(Person[] A, ArrayList<Person>[] solution, int index)
+    public static boolean paintFill(Color[][] screen, int x, int y, Color ncolor) {
+        if (screen[y][x] == ncolor) return false;
+        return paintFill(screen, x, y, screen[y][x], ncolor);
+    }
+    
+    public static boolean paintFill1(Color[][] screen, int x, int y, Color ncolor) {
+        if (screen[y][x] == ncolor) return false;
+        //return paintFill(screen, x, y, screen[y][x], ncolor);
+        LinkedList<Point> queue = new LinkedList<Point>();
+        queue.add(new Point(x, y));
+        Color ocolor = screen[y][x];
+        while (!queue.isEmpty()) {
+            Point point = queue.remove();
+            int i = point.y;
+            int j = point.x;
+
+                screen[i][j] = ncolor;
+                insertQueue(screen, j-1, i, ocolor, queue); // left
+                insertQueue(screen, j+1, i, ocolor, queue); // right
+                insertQueue(screen, j, i-1, ocolor, queue); // top
+                insertQueue(screen, j, i+1, ocolor, queue); // bottom
+
+        }
+        return true;
+    }
+    
+    
+    
+    private static void insertQueue(Color[][] screen, int x, int y, Color ocolor, LinkedList<Point> queue)
     {
-        if (index >= A.length || index < 0) return;
-        ArrayList<Person> longest = null;
-        for (int i = 0; i < index; i++) {
-            if (A[i].isLess(A[index])) {
-                if (longest == null) {
-                    longest = solution[i];
-                } else {
-                    longest = solution[i].size() > longest.size() ? solution[i] : longest;
-                }
-            }
+        if (x < 0 || x >= screen[0].length || y < 0 || y >= screen.length) return;
+        //System.out.println("HERE!");
+        if (screen[y][x] == ocolor) {
+            //System.out.println("HERE!");
+            queue.add(new Point(x, y));
         }
-        solution[index] = new ArrayList<Person>();
-        if (longest != null) {
-            solution[index].addAll(longest);
-        }
-        solution[index].add(A[index]);
-        sequence(A, solution, index+1);
     }
     
     public static void main(String[] args)
     {
-        Person[] A = new Person[6];
-        A[0] = new Person(100, 10);
-        A[1] = new Person(90, 10);
-        A[2] = new Person(80, 11);
-        A[3] = new Person(70, 10);
-        A[4] = new Person(60, 14);
-        A[5] = new Person(50, 13);
-        ArrayList<Person> result = maxSeq(A);
-        for (Person p: result) {
-            System.out.print("(" + p.height + "," + p.weight + ") ");
+        Color[][] screen = {
+            {Color.Red, Color.Green, Color.Green, Color.Black, Color.Yellow},
+            {Color.Green, Color.Red, Color.Red, Color.Red, Color.Green},
+            {Color.Green, Color.Red, Color.Red, Color.Red, Color.Green},
+            {Color.Red, Color.Red, Color.Red, Color.Red, Color.Yellow},
+            {Color.Red, Color.Yellow, Color.Red, Color.Black, Color.Yellow}
+        };
+        for (int y = 0; y < 5; y++) {
+            for (int x = 0; x < 5; x++) {
+                System.out.print(screen[y][x] + "    ");
+            }
+            System.out.println();
         }
+        paintFill1(screen, 2, 2, Color.Black);
         System.out.println();
+        for (int y = 0; y < 5; y++) {
+            for (int x = 0; x < 5; x++) {
+                System.out.print(screen[y][x] + "    ");
+            }
+            System.out.println();
+        }
+        
     }
 }

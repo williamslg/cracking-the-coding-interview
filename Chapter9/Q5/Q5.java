@@ -1,117 +1,75 @@
+import java.util.ArrayList;
+import java.util.Collections;
 public class Q5
 {
-    public static int search(String[] A, String target)
+    // 1. use a list as a stack to save one permutation
+    public static ArrayList<String> permutation(String str)
     {
-        if (A == null || target == null || target == "") {
-            return -1;
-        }
-        return search(A, 0, A.length-1, target);
+        ArrayList<String> result = new ArrayList<String>();
+        
+        if (str == null || str.isEmpty()) return result;
+        
+        ArrayList<Character> list = new ArrayList<Character>();
+        helper(result, list, str, 0);
+        return result;
     }
     
-    /*
-     * Recursive version
-     */
-    public static int search(String[] A, int low, int high, String target)
+    // use a list to store the permutation, iterate the string characters keep inserting them into spots 
+    private static void helper(ArrayList<String>result, ArrayList<Character> list, String str, int pos)
     {
-        
-        if (low > high) return -1;
-        int mid = (low + high)/2;
-        if (A[mid].equals(target)) return mid;
-        
-        if (A[mid].isEmpty()) { // find one MID that is not empty
-            int left = mid - 1;
-            int right = mid + 1;
-            
-            while (true) {
-                if (left < low && right > high) {
-                    return -1;
-                } else if (right <= high && !A[right].isEmpty()) {
-                    mid = right;
-                    break;
-                } else if (left >= low && !A[left].isEmpty()) {
-                    mid = left;
-                    break;
-                }
-                left--;
-                right++;
+        if (pos == str.length()) {
+            StringBuilder sb = new StringBuilder();
+            for (char c: list) {
+                sb.append(c);
             }
+            result.add(sb.toString());
+            //System.out.println("*****" + sb.toString());
+            return;
         }
         
-        if (A[mid].equals(target)) {
-            return mid;
-        } else if (A[mid].compareTo(target) < 0) {
-            return search(A, mid+1, high, target);
-        } else {
-            return search(A, low, mid-1, target);
+        for (int i = 0; i <= list.size(); i++) { // for a character at pos, there are list.size() + 1 spots to insert
+            list.add(i, str.charAt(pos));
+            helper(result, list, str, pos+1);
+            list.remove(i);
         }
-        /* my only solution 
-        if (low > high) return -1;
-        if (!A[high].isEmpty() && A[high].compareTo(target) < 0) return -1;
-        if (!A[low].isEmpty() && A[low].compareTo(target) > 0) return -1;
-        
-        int mid = (low + high)/2;
-        if (A[mid].equals(target)) return mid;
-        
-        if (!A[mid].isEmpty()) {
-            if (A[mid].compareTo(target) < 0) {
-                return search(A, mid+1, high, target);
-            } else {
-                return search(A, low, mid-1, target);
-            }
-        } else {
-            int result = search(A, low, mid-1, target);
-            if (result == -1) {
-                result = search(A, mid+1, high, target);
-            }
-            return result;
-        }
-        */
     }
     
-    /*
-     * Iterative version
-     */
-    public static int iterativeSearch(String[] A, String target)
+    // 2. Recursion thinking, solve a big problem from a small problems
+    
+    public static ArrayList<String> getPerm(String str, int pos)
     {
-        if (A == null || target == null || target.equals("")) {
-            return -1;
+        ArrayList<String> list = new ArrayList<String>();
+        if (pos == str.length() - 1) {
+            list.add(str.charAt(pos) + "");
+            return list;
         }
-        int low = 0;
-        int high = A.length-1;
         
-        while (low <= high) {
-            int mid = (low+high)/2;
-            if (A[mid].isEmpty()) {
-                int left = mid - 1;
-                int right = mid + 1;
-                while (true) {
-                    if (left < low && right > high) {
-                        return -1;
-                    } else if (right <= high && !A[right].isEmpty()) {
-                        mid = right;
-                        break;
-                    } else if (left >= low && !A[left].isEmpty()) {
-                        mid = left;
-                        break;
-                    }
-                    left--;
-                    right++;
-                }
-            }
-            if (A[mid].equals(target)) {
-                return mid;
-            } else if (A[mid].compareTo(target) < 0) {
-                low = mid + 1;
-            } else {
-                high = mid - 1;
+        ArrayList<String> subList = getPerm(str, pos + 1);
+        for (String s: subList) {
+            for (int i = 0; i <= s.length(); i++) {
+                String result = insertChar(s, str.charAt(pos), i);
+                list.add(result);
             }
         }
-        return -1;
+        return list;
+    }
+    
+    private static String insertChar(String s, char c, int pos)
+    {
+        String start = s.substring(0, pos);
+        String end = s.substring(pos);
+        return start + c + end;
     }
     
     public static void main(String[] args)
     {
-        String[] A = {"at", "", "", "", "ball", "", "", "car", "", "", "dad", "", ""};
-        System.out.println(iterativeSearch(A, "car"));
+        String str = "123";
+        //ArrayList<String> result = permutation(str);
+        ArrayList<String> result = getPerm(str, 0);
+        Collections.sort(result);
+        System.out.println(result.size());
+        for (String s: result) {
+            System.out.println(s);
+        }
     }
 }

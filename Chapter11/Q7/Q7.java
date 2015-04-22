@@ -76,16 +76,59 @@ public class Q7
         sequence(A, solution, index+1);
     }
     
+    
+    
+    /*
+     * New version after learning DP, Don't have to save all the other list, only find the max number and building from the parent[]
+     */
+    public static ArrayList<Person> getMax(Person[] A)
+    {
+        ArrayList<Person> list = new ArrayList<Person>();
+        if (A == null) return list;
+        
+        Arrays.sort(A);
+        
+        int[] num = new int[A.length]; // num[i] saves the max number of Longest Increasing Sequence ends at index i
+        int[] parent = new int[A.length]; // parent[i] saves the previous element index of i
+        
+        int max = 0;
+        int maxindex = 0;
+        
+        for (int i = 0; i < A.length; i++) {
+            num[i] = 1;
+            parent[i] = i;
+            
+            for (int j = 0; j <= i-1; j++) {
+                if (A[j].isLess(A[i]) && num[j] + 1 > num[i]) {
+                    num[i] = num[j] + 1;
+                    parent[i] = j;
+                }
+            }
+            if (num[i] > max) {
+                max = num[i];
+                maxindex = i;
+            }
+        }
+        
+        while (maxindex != parent[maxindex]) {
+            list.add(0, A[maxindex]);
+            maxindex = parent[maxindex];
+        }
+        list.add(0, A[maxindex]);
+        return list;
+    }
+    
     public static void main(String[] args)
     {
         Person[] A = new Person[6];
-        A[0] = new Person(100, 10);
-        A[1] = new Person(90, 10);
-        A[2] = new Person(80, 11);
-        A[3] = new Person(70, 10);
-        A[4] = new Person(60, 14);
-        A[5] = new Person(50, 13);
-        ArrayList<Person> result = maxSeq(A);
+        A[0] = new Person(65, 100);
+        A[1] = new Person(70, 150);
+        A[2] = new Person(56, 90);
+        A[3] = new Person(75, 190);
+        A[4] = new Person(60, 95);
+        A[5] = new Person(68, 110);
+        //ArrayList<Person> result = maxSeq(A);
+        ArrayList<Person> result = getMax(A);
         for (Person p: result) {
             System.out.print("(" + p.height + "," + p.weight + ") ");
         }

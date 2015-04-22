@@ -2,17 +2,19 @@ public class MinCoin
 {
     private int[] Min;
     private int[] Coin;
+    private int[] parent;
     
     public MinCoin(int[] coin, int capacity)
     {
         Min = new int[capacity];
+        parent = new int[capacity];
         for (int i = 0; i < capacity; i++) {
             Min[i] = Integer.MAX_VALUE;
         }
         Coin = new int[coin.length];
         for (int i = 0; i < coin.length; i++) {
             Coin[i] = coin[i];
-            System.out.println(Coin[i]);
+            //System.out.println(Coin[i]);
         }
     }
     
@@ -22,10 +24,18 @@ public class MinCoin
             for (int j = 0; j < Coin.length; j++) {
                 if (Coin[j] <= i && Min[i-Coin[j]] + 1 < Min[i]) {
                     Min[i] = Min[i-Coin[j]] + 1;
+                    parent[i] = i - Coin[j];
                 }
             }
         }
         System.out.println(Min[n]);
+        int p = n;
+        while (parent[p] != p) {
+            System.out.print(p-parent[p]);
+            System.out.print(" ");
+            p = parent[p];
+        }
+        System.out.println();
     }
     
     public static void main(String[] args)

@@ -1,162 +1,86 @@
-import java.util.ArrayList;
-import java.util.HashMap;
 public class Q8
 {
-    /*
-     * This version use a binary tree to keep left subtree <= the root and right subtree > the root
-     */
-    private TreeNode root = null;
-    public void track(int x) 
+    public static int getNum(int n, int c)
     {
-        if (root == null) root = new TreeNode(x);
-        else root.insert(x);
+        int num = 0;
+        if (n < 0) return 0;
+        if (n == 0) return 1;
+        if (n >= 25 && c >= 25) {
+            num += getNum(n-25, 25);
+        }
+        if (n >= 10 && c >= 10) {
+            num += getNum(n-10, 10);
+        }
+        if (n >= 5 && c >= 5) {
+            num += getNum(n-5, 5);
+        }
+        if (n >= 1 && c >= 1) {
+            num += getNum(n-1, 1);
+        }
+        return num;
     }
     
-    public int getRankOfNumber(int x)
+    public static int getNum2(int sum, int c, int n)
     {
-        if (root == null) return -1;
-        else return root.getRank(x);
-    }
-    
-    /*
-     * In-order traversal to test if its result is in sorted order
-     */
-    public void Inorder()
-    {
-        Inorder(root);
-    }
-    
-    private void Inorder(TreeNode node)
-    {
-        if (node == null) return;
-        Inorder(node.left);
-        System.out.print(node.data + " ");
-        Inorder(node.right);
-    }
-    
-    private class TreeNode 
-    {
-        public int data;
-        public int leftsize;
-        public TreeNode left, right;
+        if (sum > n) return 0;
+        if (sum == n) return 1;
         
-        public TreeNode(int x)
-        {
-            data = x;
-            leftsize = 0;
-            left = null;
-            right = null;
-        }
+        int ways = 0;
         
-        public void insert(int x) {
-            if (x > data) {
-                if (right != null) {
-                    right.insert(x);
-                } else {
-                    right = new TreeNode(x);
-                }
-            } else {
-                if (left != null) {
-                    left.insert(x);
-                } else {
-                    left = new TreeNode(x);
-                }
-                leftsize++;
-            }
+        if (c == 25) {
+            ways += getNum2(sum + 25, 25, n);
         }
-        
-        public int getRank(int x) {
-            if (x == data) {
-                return leftsize;
-            } else if  (x < data) {
-                if (left == null) {
-                    return -1;
-                } else {
-                    return left.getRank(x);
-                }
-            } else {
-                if (right == null) {
-                    return -1;
-                } else {
-                    int result = right.getRank(x);
-                    if (result != -1) {
-                        result = leftsize + 1 + result;
-                    }
-                    return result;
-                }
-            }
+        if (c >= 10) {
+            ways += getNum2(sum + 10, 10, n);
         }
+        if (c >= 5) {
+            ways += getNum2(sum + 5, 5, n);
+        }
+        if (c >= 1) {
+            ways += getNum2(sum + 1, 1, n);
+        }
+        return ways;
     }
     
-    
-    
-    /* Those codes below are use array to do O(n) insertion to keep a sorted array
-     * Do binary search to get the index of the right most x
-     *
-    /*
-    private ArrayList<Integer> array;
-    //private HashMap<Integer, Integer> hash;
-    
-    public Q8()
+    public static int getNum3(int n, int[] cent, int pos)
     {
-        array = new ArrayList<Integer>();
-        //hash = new HashMap<Integer, Integer>();
+        if (pos == cent.length - 1) return 1;
+        int ways = 0;
+        for (int i = 0; i * cent[pos] <= n; i++) {
+            ways += getNum3(n-i*cent[pos], cent, pos+1);
+        }
+        return ways;
     }
     
-    public void track(int x) { //O(n)
-        if (array.size() == 0) {
-            array.add(x);
-            return;
-        }
-        int i = array.size() - 1;
-        while(i >= 0 && array.get(i) > x) {
-            i--;
-        }
-        if (i < 0) {
-            array.add(0, x);
-        } else if (i == array.size() - 1) {
-            array.add(x);
-        } else {
-            array.add(i+1, x);
-        }
+    public static int makeChange(int n)
+    {
+        int[] cent = {25, 10, 5, 1};
+        int[][] map = new int[n+1][cent.length];
+        return getNum4(n, cent, 0, map);
     }
     
-    public int getRankOfNumber(int x) { //O(log(n))
-        int low = 0;
-        int high = array.size() - 1;
-        int index = -1;
-        while (low <= high) {
-            int mid = (low + high)/2;
-            int value = array.get(mid);
-            if (value == x) {
-                index = mid;
-                low = mid + 1;
-            } else if (value < x) {
-                low = mid + 1;
-            } else {
-                high = mid - 1;
-            }
+    public static int getNum4(int n, int[] cent, int pos, int[][] map)
+    {
+        if (map[n][pos] > 0) {
+            System.out.println(n + " : " + pos + " : " + map[n][pos]);
+            return map[n][pos];
         }
-        return index;
+        if (pos == cent.length - 1) return 1;
+        int ways = 0;
+        for (int i = 0; i * cent[pos] <= n; i++) {
+            ways += getNum4(n-i*cent[pos], cent, pos+1, map);
+        }
+        map[n][pos] = ways;
+        return ways;
     }
-    */
     
     public static void main(String[] args)
     {
-        Q8 rank = new Q8();
-        rank.track(5);
-        rank.track(1);
-        rank.track(4);
-        rank.track(5);
-        rank.track(3);
-        rank.track(9);
-        rank.track(7);
-        rank.track(13);
-        rank.track(4);
-        rank.track(1);
-        System.out.println(rank.getRankOfNumber(1));
-        System.out.println(rank.getRankOfNumber(3));
-        System.out.println(rank.getRankOfNumber(8));
-        rank.Inorder();
+        int[] cent = {25, 10, 5, 1};
+        int n = 1000;
+        System.out.println(getNum(n, 25));
+        System.out.println(getNum2(0, 25, n));
+        System.out.println(getNum3(n, cent, 0));
+        System.out.println(makeChange(n));
     }
 }
